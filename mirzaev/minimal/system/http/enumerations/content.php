@@ -115,6 +115,7 @@ enum content: string
 		return match ($this) {
 			self::jpeg => 'jpg',
 			self::png => 'png',
+			self::webp => 'webp',
 			self::form, self::mixed, self::alternative, self::related => throw new exception_argument('Content can not have file extension', status::internal_server_error->value),
 			default => throw new exception_domain('Failed to recognize content: ' . $this->value, status::not_found->value)
 		};

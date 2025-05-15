@@ -320,7 +320,7 @@ final class response
 	 */
 	public function validate(request $request): self|false
 	{
-		if (str_contains($request->headers['accept'], $this->headers['content-type'] ?? '')) {
+		if (str_contains($request->headers['accept'] ?? '', $this->headers['content-type'] ?? '')) {
 			// Validated with "accept" and "content-type"
 	
 			// Exit (success)
@@ -453,10 +453,10 @@ final class response
 		flush();
 
 		// Deinitializing headers property
-		unset($this->headers);
+		$this->headers = [];
 	
 		// Deinitializing headers
-		header_remove();
+		/* header_remove(); */
 		
 		// Exit (success)
 		return $this;
