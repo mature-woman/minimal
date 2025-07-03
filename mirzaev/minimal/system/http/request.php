@@ -51,7 +51,7 @@ final class request
 	 */
 	public method $method {
 		// Write
-		set (method|string $value) {
+		set(method|string $value) {
 			if (isset($this->{__PROPERTY__})) {
 				// The property is already initialized
 
@@ -61,23 +61,23 @@ final class request
 
 			if ($value instanceof method) {
 				// Received implementation of the method
-		
+
 				// Writing
 				$this->method = $value;
 			} else {
 				// Received a string literal (excected name of the method)
-				
+
 				// Initializing implementator of the method
 				$method = method::{strtolower($value)};
 
 				if ($method instanceof method) {
 					// Initialized implementator of the method
-					
+
 					// Writing
 					$this->method = $method;
 				} else {
 					// Not initialized implementator of the method
-					
+
 					// Exit (fail)
 					throw new exception_domain('Failed to recognize method: ' . $value, status::not_implemented->value);
 				}
@@ -96,7 +96,7 @@ final class request
 	 */
 	public string $uri {
 		// Write
-		set (string $value) {
+		set(string $value) {
 			if (isset($this->{__PROPERTY__})) {
 				// The property is already initialized
 
@@ -121,7 +121,7 @@ final class request
 	 */
 	public protocol $protocol {
 		// Write
-		set (protocol|string $value) {
+		set(protocol|string $value) {
 			if (isset($this->{__PROPERTY__})) {
 				// The property is already initialized
 
@@ -131,23 +131,23 @@ final class request
 
 			if ($value instanceof protocol) {
 				// Received implementation of HTTP version
-		
+
 				// Writing
 				$this->protocol = $value;
 			} else {
 				// Received a string literal (excected name of HTTP version)
-				
+
 				// Initializing implementator of HTTP version
 				$protocol = protocol::tryFrom($value);
 
 				if ($protocol instanceof protocol) {
 					// Initialized implementator of HTTP version
-					
+
 					// Writing
 					$this->protocol = $protocol;
 				} else {
 					// Not initialized implementator of HTTP version
-					
+
 					// Exit (fail)
 					throw new exception_domain('Failed to recognize HTTP version: ' . $value, status::http_version_not_supported->value);
 				}
@@ -187,16 +187,16 @@ final class request
 	 */
 	public array $parameters {
 		// Write
-		set (array $value) {
+		set(array $value) {
 			if (isset($this->{__PROPERTY__})) {
 				// The property is already initialized
 
 				// Exit (fail)
 				throw new exception_runtime('The property is already initialized: ' . __PROPERTY__, status::internal_server_error->value);
 			}
-	
+
 			// Writing
-			$this->parameters = $value;	
+			$this->parameters = $value;
 		}
 
 		// Read
@@ -222,7 +222,7 @@ final class request
 	 */
 	public array $files {
 		// Write
-		set (array $value) {
+		set(array $value) {
 			if (isset($this->{__PROPERTY__})) {
 				// The property is already initialized
 
@@ -233,14 +233,14 @@ final class request
 			if (isset($this->method)) {
 				// Initialized method 
 
-				if ($this->method->body())	{
+				if ($this->method->body()) {
 					// Request with this method can has body
 
 					// Writing
-					$this->files = $value;	
+					$this->files = $value;
 				} else {
 					// Request with this method can not has body
-				
+
 					// Exit (fail)
 					throw new exception_logic('Request with ' . $this->method->value . ' method can not has body therefore can not has files', status::internal_server_error->value);
 				}
@@ -270,7 +270,7 @@ final class request
 	 */
 	public array $options {
 		// Write
-		set (array $value) {
+		set(array $value) {
 			if (isset($this->{__PROPERTY__})) {
 				// The property is already initialized
 
@@ -334,7 +334,7 @@ final class request
 
 		if (isset($headers)) {
 			// Received headers
-			
+
 			// Declaring the buffer of headers
 			$buffer = [];
 
@@ -346,10 +346,10 @@ final class request
 
 				if (empty($name)) {
 					// Not normalized name of header
-					
+
 					// Exit (fail)
 					throw new exception_domain('Failed to normalize name of header', status::internal_server_error->value);
-				} 
+				}
 
 				// Writing into the buffer of headers
 				$buffer[$name] = $value;
@@ -382,7 +382,7 @@ final class request
 
 			if (!isset($headers)) {
 				// Received headers
-			
+
 				// Declaring the buffer of headers
 				$buffer = [];
 
@@ -394,10 +394,10 @@ final class request
 
 					if (empty($name)) {
 						// Not normalized name of header
-					
+
 						// Exit (fail)
 						throw new exception_domain('Failed to normalize name of header', status::internal_server_error->value);
-					} 
+					}
 
 					// Writing into the buffer of headers
 					$buffer[$name] = $value;
@@ -410,7 +410,7 @@ final class request
 				unset($buffer);
 			}
 
-			if ($this->headers['content-type'] === content::json->value) {
+			if (str_starts_with($this->headers['content-type'], content::json->value)) {
 				// The body contains "application/json"
 
 				// Initializing data from the input buffer
@@ -438,10 +438,13 @@ final class request
 
 				// Writing files from environment into the property
 				$this->files = $_FILES ?? [];
-			}	else if ($this->method->body())	{
+			} else if ($this->method->body()) {
 				// Non POST method and can has body
 
-				if (match($this->headers['content-type']) { content::form->value, content::encoded->value => true, default => false }) {
+				if (
+					str_starts_with($this->headers['content-type'], content::form->value) ||
+					str_starts_with($this->headers['content-type'], content::encoded->value)
+				) {
 					// Non POST method and the body content type is "multipart/form-data" or "application/x-www-form-urlencoded"
 
 					// Writing parameters and files from environment into the properties
@@ -475,13 +478,13 @@ final class request
 	 * 
 	 * @return response Reponse for request
 	 */
-	public function response(): response 
+	public function response(): response
 	{
 		// Exit (success)
 		return new response(protocol: $this->protocol, status: status::ok);
 	}
 
-  /**
+	/**
 	 * Header
 	 *
 	 * Write a header to the headers property
@@ -493,7 +496,7 @@ final class request
 	 *
 	 * @return self The instance from which the method was called (fluent interface)
 	 */
-	public function header(string $name, string $value): self 
+	public function header(string $name, string $value): self
 	{
 		// Normalizing name of header and writing to the headers property (https://www.rfc-editor.org/rfc/rfc7540#section-8.1.2)
 		$this->headers[mb_strtolower($name, 'UTF-8')] = $value;
