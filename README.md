@@ -12,7 +12,7 @@ Execute: `composer require mirzaev/minimal`
 ## Usage
 *index.php*
 ```php
-// Initializing core
+// Initializing the core
 $core = new core(namespace: __NAMESPACE__);
 
 // Initializing routes
@@ -25,7 +25,7 @@ $core->router
 	->write('/$categories', new route('categories', 'read'), 'GET') // Collector (since 0.3.0)
 ;
 
-// Handling request
+// Handling the request
 $core->start();
 ```
 
