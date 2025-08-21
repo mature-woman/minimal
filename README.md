@@ -1,5 +1,5 @@
 # MINIMAL
-The best code-to-utility ratio Framework
+The best code-to-utility Framework
 
 ## Nearest plans (2025)
 1. **Middlewares** technology
