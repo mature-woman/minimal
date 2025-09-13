@@ -6,16 +6,16 @@ namespace mirzaev\minimal\http;
 
 // Files of the project
 use mirzaev\minimal\http\enumerations\method,
-	mirzaev\minimal\http\enumerations\protocol,
-	mirzaev\minimal\http\enumerations\status,
-	mirzaev\minimal\http\enumerations\content,
-	mirzaev\minimal\http\response;
+mirzaev\minimal\http\enumerations\protocol,
+mirzaev\minimal\http\enumerations\status,
+mirzaev\minimal\http\enumerations\content,
+mirzaev\minimal\http\response;
 
 // Built-in libraries
 use DomainException as exception_domain,
-	InvalidArgumentException as exception_argument,
-	RuntimeException as exception_runtime,
-	LogicException as exception_logic;
+InvalidArgumentException as exception_argument,
+RuntimeException as exception_runtime,
+LogicException as exception_logic;
 
 /**
  * Request
@@ -280,16 +280,16 @@ final class request
 
 			// Writing
 			$this->options = array_filter(
-				$value,
-				fn(string $key) => match ($key) {
-					'post_max_size',
-					'max_input_vars',
-					'max_multipart_body_parts',
-					'max_file_uploads',
-					'upload_max_filesize' => true,
-					default => throw new exception_domain("Failed to recognize option: $key", status::internal_server_error->value)
-				},
-				ARRAY_FILTER_USE_KEY
+			$value,
+			fn(string $key) => match ($key) {
+				'post_max_size',
+				'max_input_vars',
+				'max_multipart_body_parts',
+				'max_file_uploads',
+				'upload_max_filesize' => true,
+				default => throw new exception_domain("Failed to recognize option: $key", status::internal_server_error->value)
+			},
+			ARRAY_FILTER_USE_KEY
 			);
 		}
 
@@ -324,13 +324,16 @@ final class request
 		bool $environment = false
 	) {
 		// Writing method from argument into the property
-		if (isset($method)) $this->method = $method;
+		if (isset($method))
+			$this->method = $method;
 
 		// Writing URI from argument into the property
-		if (isset($uri)) $this->uri = $uri;
+		if (isset($uri))
+			$this->uri = $uri;
 
 		// Writing verstion of HTTP protocol from argument into the property
-		if (isset($protocol)) $this->protocol = $protocol;
+		if (isset($protocol))
+			$this->protocol = $protocol;
 
 		if (isset($headers)) {
 			// Received headers
@@ -363,10 +366,12 @@ final class request
 		}
 
 		// Writing parameters from argument into the property
-		if (isset($parameters)) $this->parameters = $parameters;
+		if (isset($parameters))
+			$this->parameters = $parameters;
 
 		// Writing files from argument into the property
-		if (isset($files)) $this->files = $files;
+		if (isset($files))
+			$this->files = $files;
 
 		if ($environment) {
 			// Requested to write values from environment
@@ -410,7 +415,7 @@ final class request
 				unset($buffer);
 			}
 
-			if (str_starts_with($this->headers['content-type'], content::json->value)) {
+			if (str_starts_with($this->headers['content-type'] ?? '', content::json->value)) {
 				// The body contains "application/json"
 
 				// Initializing data from the input buffer
@@ -467,8 +472,10 @@ final class request
 		}
 
 		// Validating of required properties
-		if (empty($this->method)) throw new exception_argument('Failed to initialize method of the request', status::internal_server_error->value);
-		if (empty($this->uri)) throw new exception_argument('Failed to initialize URI of the request', status::internal_server_error->value);
+		if (empty($this->method))
+			throw new exception_argument('Failed to initialize method of the request', status::internal_server_error->value);
+		if (empty($this->uri))
+			throw new exception_argument('Failed to initialize URI of the request', status::internal_server_error->value);
 	}
 
 	/**
