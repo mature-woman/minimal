@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace mirzaev\minimal;
 
+// Files of the project
+use mirzaev\minimal\controller,
+	mirzaev\minimal\middleware,
+	mirzaev\minimal\traits\middleware as middleware_trait;
+
 /**
  * Route
  *
@@ -14,14 +19,18 @@ namespace mirzaev\minimal;
  * @param string|model $model Name of the model
  * @param array $parameters Arguments for the $this->method (will be concatenated together with generated request parameters)
  * @param array $options Options for `request_parse_body($options)`
+ * @param array $middlewares Stack of middlewares
  *
- * @method void __construct(string|controller $controller, ?string $method, string|model|null $model, array $parameters, array $options) Constructor
+ * @method void __construct(string|controller $controller, ?string $method, string|model|null $model, array $parameters, array $options, array $middlewares) Constructor
+ * @method self middleware(middleware $middleware) Middleware
  *
  * @license http://www.wtfpl.net/ Do What The Fuck You Want To Public License
  * @author Arsen Mirzaev Tatyano-Muradovich <arsen@mirzaev.sexy>
  */
 final class route
 {
+	use middleware_trait;
+
 	/**
 	 * Controller
 	 * 
@@ -37,7 +46,7 @@ final class route
 	 * 
 	 * @var string $method Name of the method of the method of $this->controller
 	 */
-	public string $method{
+	public string $method {
 		// Read
 		get => $this->method;
 	}
@@ -69,8 +78,8 @@ final class route
 	 *
 	 * Required if $this->method !== method::post
 	 *
-	 * @see https://wiki.php.net/rfc/rfc1867-non-post about request_parse_body()
-	 * @see https://wiki.php.net/rfc/property-hooks (find a table about backed and virtual hooks)
+	 * @see https://wiki.php.net/rfc/rfc1867-non-post About request_parse_body()
+	 * @see https://wiki.php.net/rfc/property-hooks Hooks (find a table about backed and virtual hooks)
 	 *
 	 * @throws exception_runtime if reinitialize the property
 	 * 
@@ -78,7 +87,7 @@ final class route
 	 */
 	public array $options {
 		// Write
-		set (array $value) {
+		set(array $value) {
 			if (isset($this->{__PROPERTY__})) {
 				// The property is already initialized
 
@@ -113,6 +122,7 @@ final class route
 	 * @param string|model|null $model Name of the model
 	 * @param array $parameters Arguments for the $method (will be concatenated together with generated request parameters)
 	 * @param array $options Options for `request_parse_body` (Only for POST method)
+	 * @param array $middlewares Middlewares stack
 	 *
 	 * @return void
 	 */
@@ -121,7 +131,8 @@ final class route
 		?string $method = 'index',
 		string|model|null $model = null,
 		array $parameters = [],
-		array $options = []
+		array $options = [],
+		array $middlewares = []
 	) {
 		// Writing name of the controller
 		$this->controller = $controller;
@@ -134,6 +145,32 @@ final class route
 
 		// Writing parameters
 		$this->parameters = $parameters;
+
+		// Declaring the register of the middlewares stack validity
+		$stack = true;
+
+		foreach ($middlewares as $middleware) {
+			// Iterating over middlewares
+
+			if ($middleware instanceof middleware) {
+				// Initialized the middleware
+			} else {
+				// Not initialized the middleware
+
+				// Writing the register of the middlewares stack validity
+				$stack = false;
+
+				// Exit (fail)
+				break;
+			}
+		}
+
+		if ($stack) {
+			// The middlewares stack is valid
+
+			// Writing the middlewares stack
+			$this->middlewares = $middlewares;
+		}
 
 		// Writing options
 		if (match ($method) {

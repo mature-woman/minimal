@@ -14,7 +14,8 @@ use mirzaev\minimal\router,
 	mirzaev\minimal\http\enumerations\status;
 
 // Built-in libraries
-use exception,
+use Closure as closure,
+	Exception as exception,
 	RuntimeException as exception_runtime,
 	BadMethodCallException as exception_method,
 	DomainException as exception_domain,
@@ -113,8 +114,41 @@ final class core
 	 */
 	public function start(): ?string
 	{
-		// Handle request and exit (success)
-		return $this->request(new request(environment: true));
+		if (php_sapi_name() === 'cli') {
+			// Processing from CLI
+
+			// Initializing options
+			$options = getopt('', [
+				'method::',
+				'uri::',
+				'protocol::'
+			]);
+
+			// Writing method into the environment constant
+			$_SERVER["REQUEST_METHOD"] = $options['method'] ?? 'GET';
+
+			// Writing URI into the environment constant
+			$_SERVER['REQUEST_URI'] =  $options['uri'] ?? '/';
+
+			// Writing verstion of HTTP protocol into the environment constant
+			$_SERVER['SERVER_PROTOCOL'] = $options['protocol'] ?? 'CLI';
+		}
+
+		// Preparing the route function
+		$action = fn(): string => (string) $this->request(new request(environment: true));
+
+		foreach ($this->router->middlewares as $middleware) {
+			// Iterating over the router middlewares
+
+			// Preparing the middleware function
+			$action = fn(): string => $middleware(next: $action);
+		}
+
+		// Processing middlewares and the router request function
+		$response = $action();
+
+		// Exit (success)
+		return $response;
 	}
 
 	/**
@@ -123,30 +157,43 @@ final class core
 	 * Handle request
 	 *
 	 * @param request $request The request
-	 * @paam array $parameters parameters for merging with route parameters
+	 * @param array $parameters parameters for merging with route parameters
 	 *
 	 * @return string|null Response 
 	 */
 	public function request(request $request, array $parameters = []): ?string
 	{
-		// Matching a route 
+		// Matching the route 
 		$route = $this->router->match($request);
 
 		if ($route) {
-			// Initialized a route
+			// Initialized the route
 
 			if (!empty($parameters)) {
 				// Recaived parameters
 
-				// Merging parameters with route parameters
+				// Merging parameters with the route parameters
 				$route->parameters = $parameters + $route->parameters;
 			}
 
-			// Writing request options from route options
+			// Writing the request options from the route options
 			$request->options = $route->options;
 
-			// Handling a route and exit (success)
-			return $this->route($route, $request);
+			// Preparing the route function
+			$action = fn(): string => (string) $this->route($route, $request);
+
+			foreach ($route->middlewares as $middleware) {
+				// Iterating over the route middlewares
+
+				// Preparing the middleware function
+				$action = fn(): string => $middleware(next: $action);
+			}
+
+			// Processing middlewares and the route functions
+			$response = $action();
+
+			// Exit (success)
+			return $response;
 		}
 
 		// Exit (fail)
@@ -171,7 +218,7 @@ final class core
 	{
 		// Initializing name of the controller class
 		$controller = $route->controller;
-	
+
 		if ($route->controller instanceof controller) {
 			// Initialized the controller
 		} else if (class_exists($controller = "$this->namespace\\controllers\\$controller")) {
@@ -240,10 +287,9 @@ final class core
 				// Exit (fail)
 				throw new exception_runtime('Caught an error while processing the route', status::internal_server_error->value, $exception);
 			}
-
 		} else {
 			// Not found the method of the controller
-		
+
 			// Exit (fail)
 			throw new exception_method('Failed to find method of the controller: ' . $route->controller::class . "->$route->method()", status::not_implemented->value);
 		}

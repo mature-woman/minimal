@@ -7,7 +7,8 @@ namespace mirzaev\minimal;
 // Files of the project
 use mirzaev\minimal\route,
 	mirzaev\minimal\http\request,
-	mirzaev\minimal\traits\singleton;
+	mirzaev\minimal\traits\singleton,
+	mirzaev\minimal\traits\middleware as middleware_trait;
 
 // Build-ing libraries
 use InvalidArgumentException as exception_argument;
@@ -21,15 +22,17 @@ use InvalidArgumentException as exception_argument;
  *
  * @method self write(string $urn, route $route, string|array $method) Write route to registry of routes (fluent interface)
  * @method route|null match(request $request) Match request URI with registry of routes
- * @method self sort() Sort routes (DEV)
+ * @method self sort() Sort routes (DEVELOPMENT)
  * @method string universalize(string $urn) Universalize URN
+ * @method self middleware(middleware $middleware) Middleware
+ * @param array $middlewares Stack of middlewares
  *
  * @license http://www.wtfpl.net/ Do What The Fuck You Want To Public License
  * @author Arsen Mirzaev Tatyano-Muradovich <arsen@mirzaev.sexy>
  */
 final class router
 {
-	use singleton;
+	use singleton, middleware_trait;
 
 	/**
 	 * Routes

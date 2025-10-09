@@ -1,14 +1,14 @@
 {
     "name": "mirzaev/minimal",
     "type": "framework",
-    "description": "My vision of a good framework",
+    "description": "The best code-to-utility framework",
     "keywords": [
         "mvc",
         "framework",
         "lightweight"
     ],
     "license": "WTFPL",
-    "homepage": "https://git.mirzaev.sexy/mirzaev/minimal",
+    "homepage": "https://git.svoboda.works/mirzaev/minimal",
     "authors": [
         {
             "name": "Arsen Mirzaev Tatyano-Muradovich",
@@ -18,8 +18,8 @@
         }
     ],
     "support": {
-        "docs": "https://git.mirzaev.sexy/mirzaev/minimal/wiki",
-        "issues": "https://git.mirzaev.sexy/mirzaev/minimal/issues"
+        "docs": "https://git.svoboda.works/mirzaev/minimal/wiki",
+        "issues": "https://git.svoboda.works/mirzaev/minimal/issues"
     },
     "require": {
         "php": "~8.4"

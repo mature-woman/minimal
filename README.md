@@ -1,10 +1,8 @@
 # MINIMAL
-The best code-to-utility Framework
+The best code-to-utility framework
 
 ## Nearest plans (2025)
-1. **Middlewares** technology
-2. Route sorting `router::sort()`
-3. Processing routes from within routes (request emulation)
+1. Routes sorting `router::sort()`
 
 ## Installation 
 Execute: `composer require mirzaev/minimal`
@@ -28,21 +26,3 @@ $core->router
 // Handling the request
 $core->start();
 ```
-
-## Projects based on MINIMAL
-
-### ebala
-**Repository:** https://git.svoboda.works/mirzaev/ebala<br>
-**Github mirror:** https://github.com/mature-woman/ebala<br>
-*I earned more than a **million rubles** from this project*<br>
-*Repositories **may** be closed at the request of the customer*<br>
-
-### Arming 
-**Repository:** https://git.svoboda.works/weby/arming<br>
-**Guthub mirror:** https://github.com/WEBY-GROUP/arming<br>
-*Telegram chat-robot marketplace*<br>
-
-### not.chat
-**Repository:** https://git.svoboda.works/mirzaev/notchat<br>
-**Github mirror:** https://github.com/mature-woman/notchat<br>
-*P2P chat project with blockchains and smart stuff*<br>

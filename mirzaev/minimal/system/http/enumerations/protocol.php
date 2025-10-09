@@ -21,4 +21,6 @@ enum protocol: string
 	case http_1_1 = 'HTTP/1.1';
 	case http_1 = 'HTTP/1.0';
 	case http_0_9 = 'HTTP/0.9';
+
+	case cli = 'CLI';
 }

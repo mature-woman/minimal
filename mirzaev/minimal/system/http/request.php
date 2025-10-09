@@ -6,16 +6,16 @@ namespace mirzaev\minimal\http;
 
 // Files of the project
 use mirzaev\minimal\http\enumerations\method,
-mirzaev\minimal\http\enumerations\protocol,
-mirzaev\minimal\http\enumerations\status,
-mirzaev\minimal\http\enumerations\content,
-mirzaev\minimal\http\response;
+	mirzaev\minimal\http\enumerations\protocol,
+	mirzaev\minimal\http\enumerations\status,
+	mirzaev\minimal\http\enumerations\content,
+	mirzaev\minimal\http\response;
 
 // Built-in libraries
 use DomainException as exception_domain,
-InvalidArgumentException as exception_argument,
-RuntimeException as exception_runtime,
-LogicException as exception_logic;
+	InvalidArgumentException as exception_argument,
+	RuntimeException as exception_runtime,
+	LogicException as exception_logic;
 
 /**
  * Request
@@ -280,16 +280,16 @@ final class request
 
 			// Writing
 			$this->options = array_filter(
-			$value,
-			fn(string $key) => match ($key) {
-				'post_max_size',
-				'max_input_vars',
-				'max_multipart_body_parts',
-				'max_file_uploads',
-				'upload_max_filesize' => true,
-				default => throw new exception_domain("Failed to recognize option: $key", status::internal_server_error->value)
-			},
-			ARRAY_FILTER_USE_KEY
+				$value,
+				fn(string $key) => match ($key) {
+					'post_max_size',
+					'max_input_vars',
+					'max_multipart_body_parts',
+					'max_file_uploads',
+					'upload_max_filesize' => true,
+					default => throw new exception_domain("Failed to recognize option: $key", status::internal_server_error->value)
+				},
+				ARRAY_FILTER_USE_KEY
 			);
 		}
 
@@ -335,35 +335,41 @@ final class request
 		if (isset($protocol))
 			$this->protocol = $protocol;
 
-		if (isset($headers)) {
-			// Received headers
+		// Declaring the buffer of headers
+		$buffer = [];
 
-			// Declaring the buffer of headers
-			$buffer = [];
+		foreach (
+			match (true) {
+				isset($headers) => $headers,
+				php_sapi_name() !== 'cli' => getallheaders(),
+				default => []
+			} as $name => $value
+		) {
+			// Iterating over headers
 
-			foreach ($headers ?? [] as $name => $value) {
-				// Iterating over headers
+			// Normalizing name of header (https://www.rfc-editor.org/rfc/rfc7540#section-8.1.2)
+			$name = mb_strtolower($name, 'UTF-8');
 
-				// Normalizing name of header (https://www.rfc-editor.org/rfc/rfc7540#section-8.1.2)
-				$name = mb_strtolower($name, 'UTF-8');
+			if (empty($name)) {
+				// Not normalized name of header
 
-				if (empty($name)) {
-					// Not normalized name of header
-
-					// Exit (fail)
-					throw new exception_domain('Failed to normalize name of header', status::internal_server_error->value);
-				}
-
-				// Writing into the buffer of headers
-				$buffer[$name] = $value;
+				// Exit (fail)
+				throw new exception_domain('Failed to normalize name of header', status::internal_server_error->value);
 			}
 
-			// Writing headers from argument into the property
-			$this->headers = $buffer;
-
-			// Deinitializing the buffer of headers
-			unset($buffer);
+			// Writing into the buffer of headers
+			$buffer[$name] = $value;
 		}
+
+		if (!empty($buffer)) {
+			// Initialized at lease one header
+
+			// Writing headers into the property
+			$this->headers = $buffer;
+		}
+
+		// Deinitializing the buffer of headers
+		unset($buffer);
 
 		// Writing parameters from argument into the property
 		if (isset($parameters))
@@ -384,36 +390,6 @@ final class request
 
 			// Writing verstion of HTTP protocol from environment into the property
 			$this->protocol ??= $_SERVER['SERVER_PROTOCOL'];
-
-			if (!isset($headers)) {
-				// Received headers
-
-				// Declaring the buffer of headers
-				$buffer = [];
-
-				foreach (getallheaders() ?? [] as $name => $value) {
-					// Iterating over headers
-
-					// Normalizing name of header (https://www.rfc-editor.org/rfc/rfc7540#section-8.1.2)
-					$name = mb_strtolower($name, 'UTF-8');
-
-					if (empty($name)) {
-						// Not normalized name of header
-
-						// Exit (fail)
-						throw new exception_domain('Failed to normalize name of header', status::internal_server_error->value);
-					}
-
-					// Writing into the buffer of headers
-					$buffer[$name] = $value;
-				}
-
-				// Writing headers from environment into the property
-				$this->headers = $buffer;
-
-				// Deinitializing the buffer of headers
-				unset($buffer);
-			}
 
 			if (str_starts_with($this->headers['content-type'] ?? '', content::json->value)) {
 				// The body contains "application/json"
