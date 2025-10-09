@@ -134,21 +134,8 @@ final class core
 			$_SERVER['SERVER_PROTOCOL'] = $options['protocol'] ?? 'CLI';
 		}
 
-		// Preparing the route function
-		$action = fn(): string => (string) $this->request(new request(environment: true));
-
-		foreach ($this->router->middlewares as $middleware) {
-			// Iterating over the router middlewares
-
-			// Preparing the middleware function
-			$action = fn(): string => $middleware(next: $action);
-		}
-
-		// Processing middlewares and the router request function
-		$response = $action();
-
-		// Exit (success)
-		return $response;
+		// Processing the request and exit (success)
+		return $this->request(new request(environment: true));
 	}
 
 	/**
@@ -176,20 +163,36 @@ final class core
 				$route->parameters = $parameters + $route->parameters;
 			}
 
-			// Writing the request options from the route options
-			$request->options = $route->options;
-
 			// Preparing the route function
-			$action = fn(): string => (string) $this->route($route, $request);
+			$action = function() use ($request, $route): string {
+				// Writing the request options from the route options
+				$request->options = $route->options;
 
-			foreach ($route->middlewares as $middleware) {
-				// Iterating over the route middlewares
+				// Preparing the route function
+				$action = fn(): string => (string) $this->route($route, $request);
+
+				foreach ($route->middlewares as $middleware) {
+					// Iterating over the route middlewares
+
+					// Preparing the middleware function
+					$action = fn(): string => $middleware(next: $action);
+				}
+
+				// Processing middlewares and the route functions
+				$response = $action();
+
+				// Exit (success)
+				return $response;
+			};
+
+			foreach ($this->router->middlewares as $middleware) {
+				// Iterating over the router middlewares
 
 				// Preparing the middleware function
 				$action = fn(): string => $middleware(next: $action);
 			}
 
-			// Processing middlewares and the route functions
+			// Processing middlewares and the router request function
 			$response = $action();
 
 			// Exit (success)
