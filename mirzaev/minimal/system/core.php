@@ -163,40 +163,8 @@ final class core
 				$route->parameters = $parameters + $route->parameters;
 			}
 
-			// Preparing the route function
-			$action = function() use ($request, $route): string {
-				// Writing the request options from the route options
-				$request->options = $route->options;
-
-				// Preparing the route function
-				$action = fn(): string => (string) $this->route($route, $request);
-
-				foreach ($route->middlewares as $middleware) {
-					// Iterating over the route middlewares
-
-					// Preparing the middleware function
-					$action = fn(): string => $middleware(next: $action);
-				}
-
-				// Processing middlewares and the route functions
-				$response = $action();
-
-				// Exit (success)
-				return $response;
-			};
-
-			foreach ($this->router->middlewares as $middleware) {
-				// Iterating over the router middlewares
-
-				// Preparing the middleware function
-				$action = fn(): string => $middleware(next: $action);
-			}
-
-			// Processing middlewares and the router request function
-			$response = $action();
-
 			// Exit (success)
-			return $response;
+			return $this->route($route, $request);
 		}
 
 		// Exit (fail)
@@ -282,8 +250,40 @@ final class core
 			// Found the method of the controller
 
 			try {
-				// Executing method of the controller and exit (success)
-				return $route->controller->{$route->method}(...($route->parameters + $request->parameters));
+				// Preparing the route function
+				$action = function() use ($request, $route): string {
+					// Writing the request options from the route options
+					$request->options = $route->options;
+
+					// Processing the method of the controller and exit (success)
+					$action = fn(): string => (string) $route->controller->{$route->method}(...($route->parameters + $request->parameters));
+
+					foreach ($route->middlewares as $middleware) {
+						// Iterating over the route middlewares
+
+						// Preparing the middleware function
+						$action = fn(): string => $middleware(next: $action, controller: $route->controller);
+					}
+
+					// Processing middlewares and the route functions
+					$response = $action();
+
+					// Exit (success)
+					return $response;
+				};
+
+				foreach ($this->router->middlewares as $middleware) {
+					// Iterating over the router middlewares
+
+					// Preparing the middleware function
+					$action = fn(): string => $middleware(next: $action, controller: $route->controller);
+				}
+
+				// Processing middlewares and the router request function
+				$response = $action();
+
+				// Exit (success)
+				return $response;
 			} catch (exception $exception) {
 				// Catched an exception
 

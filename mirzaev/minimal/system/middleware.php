@@ -6,6 +6,7 @@ namespace mirzaev\minimal;
 
 // Files of the project
 use mirzaev\minimal\http\request,
+	mirzaev\minimal\controller,
 	mirzaev\minimal\route;
 
 // Built-in libraries
@@ -51,13 +52,13 @@ final class middleware
 	 * Invoke
 	 *
 	 * @param callable $next
+	 * @param controller $controller
 	 *
 	 * @return string Output
 	 */
-	 public function __invoke(callable $next): string
+	 public function __invoke(callable $next, controller $controller): string
 	 {
 		 // Processing the middleware (entering into recursion)
-		
-		 return (string) ($this->function)(next: $next);
+		 return (string) ($this->function)(next: $next, controller: $controller);
 	 }
 }
