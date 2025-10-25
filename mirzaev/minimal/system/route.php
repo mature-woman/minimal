@@ -72,7 +72,7 @@ final class route
 		// Read
 		&get => $this->parameters;
 	}
-
+	
 	/**
 	 * Options
 	 *
@@ -112,6 +112,18 @@ final class route
 
 		// Read
 		get => $this->options ?? [];
+	}
+	
+	/**
+	 * Parameters
+	 *
+	 * @see https://wiki.php.net/rfc/property-hooks (find a table about backed and virtual hooks)
+	 * 
+	 * @var array $parameters Arguments for the $this->method (will be concatenated together with generated request parameters)
+	 */
+	public array $variables = [] {
+		// Read
+		&get => $this->variables;
 	}
 
 	/**
