@@ -26,7 +26,9 @@
     },
 		"suggest": {
 			"mirzaev/baza": "Baza database",
-			"mirzaev/pot": "Template for projects"
+			"mirzaev/pot": "Template for projects",
+			"mirzaev/languages": "Easy languages integration",
+			"mirzaev/currencies": "Easy currencies integration"
 		},
     "autoload": {
         "psr-4": {
