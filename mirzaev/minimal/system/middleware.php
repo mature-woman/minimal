@@ -10,7 +10,9 @@ use mirzaev\minimal\http\request,
 	mirzaev\minimal\route;
 
 // Built-in libraries
-use Closure as closure;
+use Closure as closure,
+	LogicException as exception_logic
+	;
 
 /**
  * Middleware
@@ -26,14 +28,14 @@ use Closure as closure;
  * @license http://www.wtfpl.net/ Do What The Fuck You Want To Public License
  * @author Arsen Mirzaev Tatyano-Muradovich <arsen@mirzaev.sexy>
  */
-final class middleware
+class middleware
 {
 	/**
 	 * Function
 	 * 
-	 * @var closure $function Function
+	 * @var closure|array $function Function
 	 */
-	 public readonly closure $function;
+	public readonly closure|array $function;
 
 	/**
 	 * Constructor
@@ -42,10 +44,28 @@ final class middleware
 	 *
 	 * @return void
 	 */
-	public function __construct(closure $function)
+	public function __construct(?closure $function = null)
 	{
-		// Writing the function
-		$this->function = $function;
+		if (static::class === self::class) {
+			// The middleware class itself
+
+			// Writing the function
+			$this->function = $function;
+		} else {
+			// The middleware inheriting class 
+
+			if (method_exists($this, 'middleware')) {
+				// Found the method
+
+				// Writing the function
+				$this->function = [$this, 'middleware'];
+			} else {
+				// Not found the method
+
+				// Exit (fail)
+				throw new exception_logic('The middleware method is not initialized', 500);
+			}
+		}
 	}
 
 	/**
@@ -56,9 +76,9 @@ final class middleware
 	 *
 	 * @return string Output
 	 */
-	 public function __invoke(callable $next, controller $controller): string
-	 {
-		 // Processing the middleware (entering into recursion)
-		 return (string) ($this->function)(next: $next, controller: $controller);
-	 }
+	public function __invoke(callable $next, controller $controller): string
+	{
+		// Processing the middleware (entering into recursion)
+		return (string) ($this->function)(next: $next, controller: $controller);
+	}
 }
