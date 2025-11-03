@@ -128,7 +128,7 @@ final class core
 			$_SERVER["REQUEST_METHOD"] = $options['method'] ?? 'GET';
 
 			// Writing URI into the environment constant
-			$_SERVER['REQUEST_URI'] =  $options['uri'] ?? '/';
+			$_SERVER['REQUEST_URI'] = $options['uri'] ?? '/';
 
 			// Writing verstion of HTTP protocol into the environment constant
 			$_SERVER['SERVER_PROTOCOL'] = $options['protocol'] ?? 'CLI';
@@ -157,7 +157,7 @@ final class core
 			// Initialized the route
 
 			if (!empty($parameters)) {
-				// Recaived parameters
+				// Received parameters
 
 				// Merging parameters with the route parameters
 				$route->parameters = $parameters + $route->parameters;
@@ -251,12 +251,12 @@ final class core
 
 			try {
 				// Preparing the route function
-				$action = function() use ($request, $route): string {
+				$action = function () use ($request, $route): string {
 					// Writing the request options from the route options
 					$request->options = $route->options;
 
 					// Processing the method of the controller and exit (success)
-					$action = fn(): string => (string) $route->controller->{$route->method}(...($route->parameters + $request->parameters));
+					$action = fn(): string => (string) $route->controller->{$route->method}(...($route->parameters + $route->variables + $request->parameters));
 
 					foreach ($route->middlewares as $middleware) {
 						// Iterating over the route middlewares
