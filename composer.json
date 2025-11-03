@@ -14,7 +14,7 @@
             "name": "Arsen Mirzaev Tatyano-Muradovich",
             "email": "arsen@mirzaev.sexy",
             "homepage": "https://mirzaev.sexy",
-            "role": "Programmer"
+            "role": "Creator"
         }
     ],
     "support": {
@@ -24,6 +24,9 @@
     "require": {
         "php": "~8.4"
     },
+		"suggest": {
+			"mirzaev/baza": "Baza database"	
+		},
     "autoload": {
         "psr-4": {
             "mirzaev\\minimal\\": "mirzaev/minimal/system"
