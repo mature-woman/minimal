@@ -25,7 +25,8 @@
         "php": "~8.4"
     },
 		"suggest": {
-			"mirzaev/baza": "Baza database"	
+			"mirzaev/baza": "Baza database",
+			"mirzaev/pot": "Template for projects"
 		},
     "autoload": {
         "psr-4": {
