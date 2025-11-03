@@ -27,6 +27,7 @@
 		"suggest": {
 			"mirzaev/baza": "Baza database",
 			"mirzaev/pot": "Template for projects",
+			"mirzaev/files": "Easy working with files",
 			"mirzaev/languages": "Easy languages integration",
 			"mirzaev/currencies": "Easy currencies integration"
 		},
