@@ -34,7 +34,7 @@ use Closure as closure,
  * @param model $model An instance of the model
  * @param router $router An instance of the router
  *
- * @mathod void __construct(?string $namespace) Constructor
+ * @method void __construct(?string $namespace) Constructor
  * @method void __destruct() Destructor
  * @method string|null start() Initialize request by environment and handle it
  * @method string|null request(request $request, array $parameters = []) Handle request
