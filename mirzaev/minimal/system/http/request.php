@@ -408,9 +408,6 @@ final class request
 					// Exit (false)
 					throw new exception_argument('Failed to validate JSON from the input buffer', status::unprocessable_content->value);
 				}
-
-				// Writing parameters from environment into the property
-				$this->parameters = $_POST ?? [];
 			} else if ($this->method === method::post) {
 				// POST method
 
