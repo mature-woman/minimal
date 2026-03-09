@@ -8,7 +8,8 @@ namespace mirzaev\minimal\traits;
 use mirzaev\minimal\http\enumerations\status;
 
 // Built-in libraries
-use exception;
+use Exception as exception,
+	DomainException as exception_domain;
 
 /**
  * Trait of magical methods
@@ -28,6 +29,8 @@ trait magic
 	/**
 	 * Write property
 	 *
+	 * @throws exception_domain Not found the proprty
+	 *
 	 * @param string $name Name of the property
 	 * @param mixed $value Value of the property
 	 *
@@ -35,13 +38,23 @@ trait magic
 	 */
 	public function __set(string $name, mixed $value = null): void
 	{
-		match ($name) {
-			default => throw new exception('Failed to find property: ' . static::class . "::\$$name", status::not_found->value)
-		};
+		if (property_exists(static, $name)) {
+			// Exist the property
+
+			// Writing the property
+			$this->{$name} = $value;
+		} else {
+			// Not exist the property
+
+			// Exit (fail)
+			throw new exception_domain('Not found the property: ' . static::class . "::\$$name", status::not_found->value);
+		}
 	}
 
 	/**
 	 * Read property
+	 *
+	 * @throws exception_domain Not found the property
 	 *
 	 * @param string $name Name of the property
 	 *
@@ -50,7 +63,7 @@ trait magic
 	public function __get(string $name): mixed
 	{
 		return match ($name) {
-			default => throw new exception('Failed to find property: ' . static::class . "::\$$name", status::not_found->value)
+			default => throw new exception_domain('Not found the property: ' . static::class . "::\$$name", status::not_found->value)
 		};
 	}
 
