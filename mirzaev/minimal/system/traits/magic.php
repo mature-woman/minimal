@@ -38,7 +38,7 @@ trait magic
 	 */
 	public function __set(string $name, mixed $value = null): void
 	{
-		if (property_exists(static, $name)) {
+		if (property_exists(static::static, $name)) {
 			// Exist the property
 
 			// Writing the property
