@@ -256,7 +256,13 @@ final class core
 					$request->options = $route->options;
 
 					// Processing the method of the controller and exit (success)
-					$action = fn(): string => (string) $route->controller->{$route->method}(...($route->parameters + $route->variables + $request->parameters));
+					$action = function() use ($route, $request): string {
+						try {
+							return (string) $route->controller->{$route->method}(...($route->parameters + $route->variables + $request->parameters));
+						} catch (exception $exception) {
+							return (string) $route->controller->{$route->method}($route->parameters + $route->variables + $request->parameters)
+						}
+					};
 
 					foreach ($route->middlewares as $middleware) {
 						// Iterating over the route middlewares
