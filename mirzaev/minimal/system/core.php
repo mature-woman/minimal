@@ -260,7 +260,7 @@ final class core
 						try {
 							return (string) $route->controller->{$route->method}(...($route->parameters + $route->variables + $request->parameters));
 						} catch (exception $exception) {
-							return (string) $route->controller->{$route->method}($route->parameters + $route->variables + $request->parameters)
+							return (string) $route->controller->{$route->method}($route->parameters + $route->variables + $request->parameters);
 						}
 					};
 
