@@ -22,7 +22,10 @@ use Closure as closure,
 	InvalidArgumentException as exception_argument,
 	UnexpectedValueException as exception_value,
 	LogicException as exception_logic,
-	ReflectionClass as reflection;
+	Error as error,
+	ArgumentCountError as error_argument_count,
+	ReflectionClass as reflection,
+	ReflectionMethod as reflection_method;
 
 /**
  * Core
@@ -255,12 +258,21 @@ final class core
 					// Writing the request options from the route options
 					$request->options = $route->options;
 
+					// Initializing the controller method arguments
+					$arguments = $route->parameters + $route->variables + $request->parameters;
+
 					// Processing the method of the controller and exit (success)
-					$action = function() use ($route, $request): string {
-						try {
-							return (string) $route->controller->{$route->method}(...($route->parameters + $route->variables + $request->parameters));
-						} catch (exception $exception) {
-							return (string) $route->controller->{$route->method}($route->parameters + $route->variables + $request->parameters);
+					$action = function () use ($route, $request, $arguments): string {
+						if (array_keys($arguments) === array_column((new reflection_method($route->controller, $route->method))->getParameters(), 'name')) {
+							// Arguments match the controller method arguments
+
+							// Exit (success)
+							return (string) $route->controller->{$route->method}(...$arguments);
+						} else {
+							// Arguments not match the controller method arguments
+
+							// Exit (success)
+							return (string) $route->controller->{$route->method}($arguments);
 						}
 					};
 
