@@ -310,15 +310,15 @@ final class request
 	public bool $smartphone {
 		// Read
 		get {
-			if (!isset($this->{__PROPERTY__})) {
+			if (!isset($this->smartphone)) {
 				// The property is not initialized
 
 				// Writing into the property
-				$this->{__PROPERTY__} = new mobile()->isMobile();
+				$this->smartphone = new mobile()->isMobile();
 			}
 
 			// Exit (success)
-			return $this->{__PROPERTY__};
+			return $this->smartphone;
 		}
 	}
 
@@ -332,15 +332,15 @@ final class request
 	public bool $tablet {
 		// Read
 		get {
-			if (!isset($this->{__PROPERTY__})) {
+			if (!isset($this->tablet)) {
 				// The property is not initialized
 
 				// Writing into the property
-				$this->{__PROPERTY__} = new mobile()->isTablet();
+				$this->tablet = new mobile()->isTablet();
 			}
 
 			// Exit (success)
-			return $this->{__PROPERTY__};
+			return $this->tablet;
 		}
 	}
 
