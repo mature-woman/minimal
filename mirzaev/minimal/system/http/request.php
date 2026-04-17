@@ -309,7 +309,7 @@ final class request
 	 */
 	public bool $smartphone {
 		// Read
-		get() {
+		get {
 			if (!isset($this->{__PROPERTY__})) {
 				// The property is not initialized
 
@@ -331,7 +331,7 @@ final class request
 	 */
 	public bool $tablet {
 		// Read
-		get() {
+		get {
 			if (!isset($this->{__PROPERTY__})) {
 				// The property is not initialized
 
