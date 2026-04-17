@@ -22,7 +22,8 @@
         "issues": "https://git.svoboda.works/mirzaev/minimal/issues"
     },
     "require": {
-        "php": "~8.4"
+        "php": "~8.4",
+        "mobiledetect/mobiledetectlib": "^4.8"
     },
 		"suggest": {
 			"mirzaev/baza": "Baza database",

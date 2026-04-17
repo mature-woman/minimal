@@ -11,6 +11,9 @@ use mirzaev\minimal\http\enumerations\method,
 	mirzaev\minimal\http\enumerations\content,
 	mirzaev\minimal\http\response;
 
+// The smartphones detection library
+use Detection\MobileDetect as mobile;
+
 // Built-in libraries
 use DomainException as exception_domain,
 	InvalidArgumentException as exception_argument,
@@ -295,6 +298,50 @@ final class request
 
 		// Read
 		get => $this->options ?? [];
+	}
+
+	/**
+	 * Smartphone
+	 *
+	 * @see https://docs.mobiledetect.net/home/usage-composer Documentation
+	 *
+	 * @var bool $smartphone The request was sent from a smartphone?
+	 */
+	public bool $smartphone {
+		// Read
+		get() {
+			if (!isset($this->{__PROPERTY__})) {
+				// The property is not initialized
+
+				// Writing into the property
+				$this->{__PROPERTY__} = new mobile()->isMobile();
+			}
+
+			// Exit (success)
+			return $this->{__PROPERTY__};
+		}
+	}
+
+	/**
+	 * Tablet
+	 *
+	 * @see https://docs.mobiledetect.net/home/usage-composer Documentation
+	 *
+	 * @var bool $tablet The request was sent from a tablet?
+	 */
+	public bool $tablet {
+		// Read
+		get() {
+			if (!isset($this->{__PROPERTY__})) {
+				// The property is not initialized
+
+				// Writing into the property
+				$this->{__PROPERTY__} = new mobile()->isTablet();
+			}
+
+			// Exit (success)
+			return $this->{__PROPERTY__};
+		}
 	}
 
 	/**
