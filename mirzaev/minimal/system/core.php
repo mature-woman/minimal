@@ -272,7 +272,7 @@ final class core
 							// Arguments not match the controller method arguments
 
 							// Exit (success)
-							return (string) $route->controller->{$route->method}($arguments);
+							return (string) $route->controller->{$route->method}($arguments ? $arguments : null);
 						}
 					};
 

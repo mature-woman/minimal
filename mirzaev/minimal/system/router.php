@@ -129,6 +129,7 @@ final class router
 						// Skipping unmatched routes based on results of previous iterations
 						if (isset($matches[$route]) && $matches[$route] === false) continue;
 
+
 						// Initializing of route directory
 						$route_directory = $routes[$route][$i] ?? null;
 
@@ -161,56 +162,70 @@ final class router
 				}
 			}
 
-			// Finding a priority route from match results
-			foreach ($matches as $route => $match) if ($match !== false) break;
+			if (array_all($matches, fn($value) => $value === false)) {
+				// Not found any route
 
-			if ($route && !empty($data = $this->routes[$route])) {
-				// Route found
+				if (false) {
+					// Initialized the errors controller
 
-				// Universalization of route
-				$route = self::universalize($route);
+					// Processing the `404` error method
 
-				/**
-				 * Initialization of route variables
-				 */
+				}
+			} else {
+				// Found At least one route
 
-				foreach ($routes[$route] as $i => $route_directory) {
-					// Iteration over directories of route
+				// Finding a priority route from all match results (setting the $route variable)
+				foreach ($matches as $route => $match) if ($match !== false) break;
+				unset($match);
 
-					if (preg_match('/^\$([a-zA-Z_\x80-\xff]+)$/', $route_directory) === 1) {
-						// The directory is a variable ($variable)
+				if ($route && !empty($data = $this->routes[$route])) {
+					// The route found
 
-						// Запись в реестр переменных и перещапись директории в маршруте
-						$data[$request->method->value]->variables[trim($route_directory, '$')] = $directories[$i];
-					} else if (preg_match('/^\$([a-zA-Z_\x80-\xff]+\.\.\.)$/', $route_directory) === 1) {
-						// The directory of route is a collector ($variable...)
+					// Universalization of the route
+					$route = self::universalize($route);
 
-						// Инициализаия ссылки на массив сборщика
-						$collector = &$data[$request->method->value]->variables[trim($route_directory, '$.')];
+					/**
+					 * Initialization of the route variables
+					 */
 
-						// Инициализаия массива сборщика
-						$collector ??= [];
+					foreach ($routes[$route] as $i => $route_directory) {
+						// Iteration over directories of route
 
-						// Запись в реестр переменных
-						$collector[] = $directories[$i];
+						if (preg_match('/^\$([a-zA-Z_\x80-\xff]+)$/', $route_directory) === 1) {
+							// The directory is a variable ($variable)
 
-						foreach (array_slice($directories, ++$i, preserve_keys: true) as &$urn_directory) {
-							// Перебор директорий URN
+							// Запись в реестр переменных и перезапись директории в маршруте
+							$data[$request->method->value]->variables[trim($route_directory, '$')] = $directories[$i];
+						} else if (preg_match('/^\$([a-zA-Z_\x80-\xff]+\.\.\.)$/', $route_directory) === 1) {
+							// The directory of route is a collector ($variable...)
+
+							// Инициализаия ссылки на массив сборщика
+							$collector = &$data[$request->method->value]->variables[trim($route_directory, '$.')];
+
+							// Инициализаия массива сборщика
+							$collector ??= [];
 
 							// Запись в реестр переменных
-							$collector[] = $urn_directory;
+							$collector[] = $directories[$i];
+
+							foreach (array_slice($directories, ++$i, preserve_keys: true) as &$urn_directory) {
+								// Перебор директорий URN
+
+								// Запись в реестр переменных
+								$collector[] = $urn_directory;
+							}
+
+							break;
 						}
-
-						break;
 					}
-				}
 
-				// Exit (success or fail)
-				return $data[$request->method->value] ?? null;
+					// Exit (success or fail)
+					return $data[$request->method->value] ?? null;
+				}
 			}
 		}
 
-		// Exit (fail)
+		// Exit (success/fail)
 		return null;
 	}
 
