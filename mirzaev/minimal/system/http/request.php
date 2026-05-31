@@ -290,7 +290,7 @@ final class request
 					'max_multipart_body_parts',
 					'max_file_uploads',
 					'upload_max_filesize' => true,
-					default => throw new exception_domain("Failed to recognize option: $key", status::internal_server_error->value)
+					default => false
 				},
 				ARRAY_FILTER_USE_KEY
 			);

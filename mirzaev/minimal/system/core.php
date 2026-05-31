@@ -261,18 +261,32 @@ final class core
 					// Initializing the controller method arguments
 					$arguments = $route->parameters + $route->variables + $request->parameters;
 
-					// Processing the method of the controller and exit (success)
+					// Processing the controller method and exit (success)
 					$action = function () use ($route, $request, $arguments): string {
-						if (array_keys($arguments) === array_column((new reflection_method($route->controller, $route->method))->getParameters(), 'name')) {
-							// Arguments match the controller method arguments
+						if (!isset($route->options['controller_method_arguments'])) {
+							// Not initialized the option
+
+							// Skipping
+							goto nothing;
+						}
+
+						if ($route->options['controller_method_arguments'] === 'strict') {
+							// Strict arguments (spread operator)
 
 							// Exit (success)
 							return (string) $route->controller->{$route->method}(...$arguments);
-						} else {
-							// Arguments not match the controller method arguments
+						} else if ($route->options['controller_method_arguments'] === 'array') {
+							// The array argument (all in one)
 
 							// Exit (success)
 							return (string) $route->controller->{$route->method}($arguments ? $arguments : null);
+						} else {
+							// Nothing
+
+							nothing:
+
+							// Exit (success)
+							return (string) $route->controller->{$route->method}();
 						}
 					};
 

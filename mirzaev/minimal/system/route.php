@@ -7,7 +7,12 @@ namespace mirzaev\minimal;
 // Files of the project
 use mirzaev\minimal\controller,
 	mirzaev\minimal\middleware,
+	mirzaev\minimal\http\enumerations\status,
 	mirzaev\minimal\traits\middleware as middleware_trait;
+
+// Built-in libraries
+use RuntimeException as exception_runtime,
+	DomainException as exception_domain;
 
 /**
  * Route
@@ -64,6 +69,8 @@ final class route
 	/**
 	 * Parameters
 	 *
+	 * Defined by request
+	 *
 	 * @see https://wiki.php.net/rfc/property-hooks (find a table about backed and virtual hooks)
 	 * 
 	 * @var array $parameters Arguments for the $this->method (will be concatenated together with generated request parameters)
@@ -74,16 +81,29 @@ final class route
 	}
 
 	/**
-	 * Options
+	 * Variables
 	 *
-	 * Required if $this->method !== method::post
+	 * Defined by route URN
+	 *
+	 * @see https://wiki.php.net/rfc/property-hooks (find a table about backed and virtual hooks)
+	 * 
+	 * @var array $variables Arguments for the $this->method (will be concatenated together with generated request parameters)
+	 */
+	public array $variables = [] {
+		// Read
+		&get => $this->variables;
+	}
+
+	/**
+	 * Options
 	 *
 	 * @see https://wiki.php.net/rfc/rfc1867-non-post About request_parse_body()
 	 * @see https://wiki.php.net/rfc/property-hooks Hooks (find a table about backed and virtual hooks)
 	 *
-	 * @throws exception_runtime if reinitialize the property
+	 * @throws exception_runtime when reinitializing the property
+	 * @throws exception_domain if not recognied the option
 	 * 
-	 * @var array $options Options for `request_parse_body($options)`
+	 * @var array $options Options
 	 */
 	public array $options {
 		// Write
@@ -103,8 +123,9 @@ final class route
 					'max_input_vars',
 					'max_multipart_body_parts',
 					'max_file_uploads',
-					'upload_max_filesize' => true,
-					default => throw new exception_domain("Failed to recognize option: $key", status::internal_server_error->value)
+					'upload_max_filesize',
+					'controller_method_arguments'	=> true,
+					default => throw new exception_domain("Failed to recognize the option: $key", status::internal_server_error->value)
 				},
 				ARRAY_FILTER_USE_KEY
 			);
@@ -115,25 +136,13 @@ final class route
 	}
 
 	/**
-	 * Parameters
-	 *
-	 * @see https://wiki.php.net/rfc/property-hooks (find a table about backed and virtual hooks)
-	 * 
-	 * @var array $parameters Arguments for the $this->method (will be concatenated together with generated request parameters)
-	 */
-	public array $variables = [] {
-		// Read
-		&get => $this->variables;
-	}
-
-	/**
 	 * Constructor
 	 *
 	 * @param string|controller $controller Name of the controller
 	 * @param string|null $method Name of the method of the method of $controller
 	 * @param string|model|null $model Name of the model
 	 * @param array $parameters Arguments for the $method (will be concatenated together with generated request parameters)
-	 * @param array $options Options for `request_parse_body` (Only for POST method)
+	 * @param array $options Options
 	 * @param array $middlewares Middlewares stack
 	 *
 	 * @return void
@@ -157,6 +166,9 @@ final class route
 
 		// Writing parameters
 		$this->parameters = $parameters;
+
+		// Writing options
+		$this->options = $options;
 
 		// Declaring the register of the middlewares stack validity
 		$stack = true;
@@ -183,11 +195,5 @@ final class route
 			// Writing the middlewares stack
 			$this->middlewares = $middlewares;
 		}
-
-		// Writing options
-		if (match ($method) {
-			'GET', 'PUT', 'PATCH', 'DELETE' => true,
-			default => false
-		}) $this->options = $options;
 	}
 }

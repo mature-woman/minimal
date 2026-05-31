@@ -57,13 +57,13 @@ final class router
 	 */
 	public function write(string $urn, route $route, string|array $method): self
 	{
-		foreach (is_array($method) ? $method : [$method] as $method) {
+		foreach (is_array($method) ? $method : [$method] as $_method) {
 			// Iterate over methods of requests
 
 			// Initializing the request
 			$request = new request(
 				uri: $urn,
-				method: $method,
+				method: $_method,
 				environment: false
 			);
 
